@@ -1,0 +1,41 @@
+```{r}
+library(openxlsx)
+library(ggplot2)
+data = read.xlsx('odds ratio_baseball.xlsx',TRUE)
+data.2 = read.xlsx('odds_ratio.csv.xlsx',TRUE)
+colnames(data.2[2]) = 'Risk.factor'
+data$Significant[data$Significant == 0] = 'plain'
+data$Significant[data$Significant == 1] = 'bold'
+
+shoulder = data[data$Risk.factor %in% data.2$Risk.factor[51:54],]
+elbow = data[data$Risk.factor %in% data.2$Risk.factor[56:81],]
+arm = data[data$Risk.factor %in% data.2$Risk.factor[2:49],]
+fp_arm <- ggplot(data=arm, aes(x=Risk.factor, y=ODDS, ymin=LOWER_CI, ymax=UPPER_CI)) +
+        geom_pointrange() + 
+        geom_hline(yintercept=1, lty=2) +  # add a dotted line at x=1 after flip
+        coord_flip() +  # flip coordinates (puts labels on y axis)
+        xlab("Risk Factor") + ylab("Mean Odds Ratio (95% CI)") +
+        theme_bw() + # use a white background
+        geom_text(aes(y = -1.5,label = arm$ODDS,hjust=0,fontface=(arm$Significant))) + ggtitle('Arm Injury Risk Odds Ratios')
+
+shoulder= shoulder[!duplicated(shoulder$Risk.factor),]
+fp_shoulder <- ggplot(data=shoulder, aes(x=Risk.factor, y=ODDS, ymin=LOWER_CI, ymax=UPPER_CI)) +
+        geom_pointrange() + 
+        geom_hline(yintercept=1, lty=2) +  # add a dotted line at x=1 after flip
+        coord_flip() +  # flip coordinates (puts labels on y axis)
+        xlab("Risk Factor") + ylab("Mean Odds Ratio (95% CI)") +
+        theme_bw() + # use a white background
+        geom_text(aes(y = -0.5,label = shoulder$ODDS,hjust=0,fontface=(shoulder$Significant))) + ggtitle('Shoulder Injury Risk Odds Ratios') + scale_x_discrete(expand = c(0,5))
+
+
+elbow = elbow[!duplicated(elbow$Risk.factor),]
+fp_elbow <- ggplot(data=elbow, aes(x=Risk.factor, y=ODDS, ymin=LOWER_CI, ymax=UPPER_CI)) +
+        geom_pointrange() + 
+        geom_hline(yintercept=1, lty=2) +  # add a dotted line at x=1 after flip
+        coord_flip() +  # flip coordinates (puts labels on y axis)
+        xlab("Risk Factor") + ylab("Mean Odds Ratio (95% CI)") +
+        theme_bw() + # use a white background
+        geom_text(aes(y = -0.5,label = elbow$ODDS,hjust=0,fontface=(elbow$Significant))) + ggtitle('Elbow Injury Risk Odds Ratios')
+
+```
+
